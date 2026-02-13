@@ -15,7 +15,7 @@ RUN git clone https://github.com/beautyaiClub/comfyui-beautyai.git /comfyui/cust
 RUN git clone https://github.com/christian-byrne/audio-separation-nodes-comfyui.git /comfyui/custom_nodes/audio-separation-nodes-comfyui && \
     cd /comfyui/custom_nodes/audio-separation-nodes-comfyui && \
     pip install --no-cache-dir -r requirements.txt
-RUN git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git /comfyui/custom_nodes/ComfyUI-VideoHelperSuite
+RUN comfy node install --exit-on-fail ComfyUI-VideoHelperSuite
 RUN comfy node install --exit-on-fail comfyui-various
 RUN comfy node install --exit-on-fail ComfyUI-WanVideoWrapper@1.4.7
 RUN comfy node install --exit-on-fail ComfyUI_Comfyroll_CustomNodes

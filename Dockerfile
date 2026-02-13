@@ -40,50 +40,45 @@ RUN mkdir -p /comfyui/models/transformers/TencentGameMate/chinese-wav2vec2-base 
     mkdir -p /comfyui/models/text_encoders && \
     mkdir -p /comfyui/models/loras/wan
 
-# Download Wav2Vec Chinese model from Hugging Face
 RUN cd /comfyui/models/transformers/TencentGameMate/chinese-wav2vec2-base && \
     wget -q https://huggingface.co/TencentGameMate/chinese-wav2vec2-base/resolve/main/config.json && \
     wget -q https://huggingface.co/TencentGameMate/chinese-wav2vec2-base/resolve/main/preprocessor_config.json && \
     wget -q https://huggingface.co/TencentGameMate/chinese-wav2vec2-base/resolve/main/pytorch_model.bin && \
     echo "✓ Wav2Vec model downloaded"
 
-# Download WanVideo models from Hugging Face
-# Note: Replace these URLs with actual Hugging Face model URLs
-# These are placeholder URLs - you need to provide the correct ones
-
-# InfiniteTalk model
+# InfiniteTalk model (5.13 GB)
 RUN wget -q -O /comfyui/models/diffusion_models/Wan2.1/Wan2_1-InfiniTetalk-Single_fp16.safetensors \
-    https://huggingface.co/Kijai/WanVideo_pruned/resolve/main/Wan2_1-InfiniTetalk-Single_fp16.safetensors || \
-    echo "⚠ InfiniteTalk model URL needs to be updated"
+    https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/InfiniteTalk/Wan2_1-InfiniTetalk-Single_fp16.safetensors && \
+    echo "✓ InfiniteTalk model downloaded"
 
-# WanVideo Main model (14B)
+# WanVideo Main model (14B) - ~20GB
 RUN wget -q -O /comfyui/models/diffusion_models/Wan2.1/wan2.1_i2v_480p_14B_fp8_e4m3fn.safetensors \
-    https://huggingface.co/Kijai/WanVideo_pruned/resolve/main/wan2.1_i2v_480p_14B_fp8_e4m3fn.safetensors || \
-    echo "⚠ WanVideo main model URL needs to be updated"
+    https://huggingface.co/PJMixers-Images/wan2.1_i2v_480p_720p_14B_fp8_e4m3fn/resolve/main/wan2.1_i2v_480p_720p_14B_fp8_e4m3fn.safetensors && \
+    echo "✓ WanVideo main model downloaded"
 
-# VAE model
+# VAE model (~254 MB)
 RUN wget -q -O /comfyui/models/vae/Wan2_1_VAE_bf16.safetensors \
-    https://huggingface.co/Kijai/WanVideo_pruned/resolve/main/Wan2_1_VAE_bf16.safetensors || \
-    echo "⚠ VAE model URL needs to be updated"
+    https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/Wan2_1_VAE_bf16.safetensors && \
+    echo "✓ VAE model downloaded"
 
 # CLIP Vision model
 RUN wget -q -O /comfyui/models/clip_vision/clip_vision_h.safetensors \
-    https://huggingface.co/h94/IP-Adapter/resolve/main/models/image_encoder/model.safetensors || \
-    echo "⚠ CLIP Vision model URL needs to be updated"
+    https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/clip_vision/clip_vision_h.safetensors && \
+    echo "✓ CLIP Vision model downloaded"
 
-# T5 text encoder
+# T5 text encoder (~10-15 GB)
 RUN wget -q -O /comfyui/models/text_encoders/umt5_xxl_fp16.safetensors \
-    https://huggingface.co/Kijai/WanVideo_pruned/resolve/main/umt5_xxl_fp16.safetensors || \
-    echo "⚠ T5 model URL needs to be updated"
+    https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/text_encoders/umt5_xxl_fp16.safetensors && \
+    echo "✓ T5 model downloaded"
 
 # LoRA models
 RUN wget -q -O /comfyui/models/loras/wan/Wan21_I2V_14B_lightx2v_cfg_step_distill_lora_rank64.safetensors \
-    https://huggingface.co/Kijai/WanVideo_pruned/resolve/main/Wan21_I2V_14B_lightx2v_cfg_step_distill_lora_rank64.safetensors || \
-    echo "⚠ LoRA 1 model URL needs to be updated"
+    https://huggingface.co/lgylgy/Wan21_I2V_14B_lightx2v_cfg_step_distill_lora_rank64/resolve/main/Wan21_I2V_14B_lightx2v_cfg_step_distill_lora_rank64.safetensors && \
+    echo "✓ LoRA 1 downloaded"
 
 RUN wget -q -O /comfyui/models/loras/wan/Wan_2_1_T2V_14B_480p_rCM_lora_average_rank_83_bf16.safetensors \
-    https://huggingface.co/Kijai/WanVideo_pruned/resolve/main/Wan_2_1_T2V_14B_480p_rCM_lora_average_rank_83_bf16.safetensors || \
-    echo "⚠ LoRA 2 model URL needs to be updated"
+    https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/LoRAs/rCM/Wan_2_1_T2V_14B_480p_rCM_lora_average_rank_83_bf16.safetensors && \
+    echo "✓ LoRA 2 downloaded"
 
 # Verify downloaded models
 RUN echo "=== Verifying downloaded models ===" && \

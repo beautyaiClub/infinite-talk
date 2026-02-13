@@ -41,20 +41,10 @@ RUN mkdir -p /comfyui/models/transformers/TencentGameMate/chinese-wav2vec2-base 
     mkdir -p /comfyui/models/loras/wan
 
 # Download Wav2Vec Chinese model (3 files)
-RUN comfy model download \
-    --url https://huggingface.co/TencentGameMate/chinese-wav2vec2-base/resolve/main/config.json \
-    --relative-path models/transformers/TencentGameMate/chinese-wav2vec2-base \
-    --filename config.json
-
-RUN comfy model download \
-    --url https://huggingface.co/TencentGameMate/chinese-wav2vec2-base/resolve/main/preprocessor_config.json \
-    --relative-path models/transformers/TencentGameMate/chinese-wav2vec2-base \
-    --filename preprocessor_config.json
-
-RUN comfy model download \
-    --url https://huggingface.co/TencentGameMate/chinese-wav2vec2-base/resolve/main/pytorch_model.bin \
-    --relative-path models/transformers/TencentGameMate/chinese-wav2vec2-base \
-    --filename pytorch_model.bin
+RUN cd /comfyui/models/transformers/TencentGameMate/chinese-wav2vec2-base && \
+    wget -q https://huggingface.co/TencentGameMate/chinese-wav2vec2-base/resolve/main/config.json && \
+    wget -q https://huggingface.co/TencentGameMate/chinese-wav2vec2-base/resolve/main/preprocessor_config.json && \
+    wget -q https://huggingface.co/TencentGameMate/chinese-wav2vec2-base/resolve/main/pytorch_model.bin
 
 # Download InfiniteTalk model (5.13 GB)
 RUN comfy model download \

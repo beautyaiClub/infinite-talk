@@ -23,6 +23,7 @@ RUN git clone https://github.com/chflame163/ComfyUI_LayerStyle.git /comfyui/cust
 
 # Install KJNodes (commonly used utility nodes)
 RUN comfy node install --exit-on-fail comfyui-kjnodes
+RUN git clone https://github.com/beautyaiClub/comfyui-beautyai.git /comfyui/custom_nodes/comfyui-beautyai
 
 # Install additional Python dependencies for audio processing
 RUN pip install --no-cache-dir \

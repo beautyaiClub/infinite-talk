@@ -33,11 +33,8 @@ RUN comfy node install --exit-on-fail comfyui-kjnodes@1.2.9
 
 # Install additional Python dependencies for audio processing
 RUN pip install --no-cache-dir \
-    pyloudnorm \
-    torchaudio \
-    librosa \
-    soundfile \
-    huggingface-hub
+    huggingface-hub \
+    av
 
 # Create directory structure for models
 RUN mkdir -p /comfyui/models/transformers/TencentGameMate/chinese-wav2vec2-base && \

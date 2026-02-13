@@ -16,34 +16,34 @@ RUN git clone https://github.com/christian-byrne/audio-separation-nodes-comfyui.
     cd /comfyui/custom_nodes/audio-separation-nodes-comfyui && \
     pip install --no-cache-dir -r requirements.txt
 
-# Install VideoHelperSuite with verification
-RUN git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git /comfyui/custom_nodes/ComfyUI-VideoHelperSuite && \
-    cd /comfyui/custom_nodes/ComfyUI-VideoHelperSuite && \
-    echo "=== VideoHelperSuite cloned successfully ===" && \
-    ls -la && \
-    pip install --no-cache-dir -r requirements.txt && \
-    echo "=== VideoHelperSuite requirements installed ===" && \
-    test -f __init__.py && echo "=== __init__.py exists ===" || echo "=== ERROR: __init__.py missing ==="
-
+# Install nodes in specific order to avoid opencv conflicts
 RUN comfy node install --exit-on-fail comfyui-various
 RUN comfy node install --exit-on-fail ComfyUI-WanVideoWrapper@1.4.7
 RUN comfy node install --exit-on-fail ComfyUI_Comfyroll_CustomNodes
 RUN comfy node install --exit-on-fail comfyui_layerstyle@2.0.38
-RUN comfy node install --exit-on-fail comfyui-kjnodes@1.2.9
+
+# Install additional Python dependencies BEFORE VideoHelperSuite and kjnodes
+RUN pip install --no-cache-dir \
+    av \
+    torchaudio \
+    imageio-ffmpeg
+
+# Install VideoHelperSuite - it will install opencv-python
+RUN git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git /comfyui/custom_nodes/ComfyUI-VideoHelperSuite && \
+    cd /comfyui/custom_nodes/ComfyUI-VideoHelperSuite && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Install kjnodes AFTER VideoHelperSuite, and prevent opencv-python-headless from being installed
+RUN comfy node install --exit-on-fail comfyui-kjnodes@1.2.9 && \
+    pip uninstall -y opencv-python-headless && \
+    pip install --no-cache-dir opencv-python
 
 # Verify VideoHelperSuite installation
 RUN echo "=== Verifying VideoHelperSuite installation ===" && \
     ls -la /comfyui/custom_nodes/ && \
     test -d /comfyui/custom_nodes/ComfyUI-VideoHelperSuite && \
-    echo "=== VideoHelperSuite directory exists ===" || \
-    (echo "=== ERROR: VideoHelperSuite directory missing ===" && exit 1)
-
-# Install additional Python dependencies (not in requirements.txt)
-RUN pip install --no-cache-dir \
-    av \
-    torchaudio \
-    opencv-python \
-    imageio-ffmpeg
+    echo "=== VideoHelperSuite directory exists ===" && \
+    python -c "import cv2; print(f'OpenCV version: {cv2.__version__}')"
 
 # Create directory structure for models
 RUN mkdir -p /comfyui/models/transformers/TencentGameMate/chinese-wav2vec2-base && \

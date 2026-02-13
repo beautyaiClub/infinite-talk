@@ -20,12 +20,14 @@ RUN comfy node install --exit-on-fail ComfyUI-WanVideoWrapper@1.4.7
 RUN comfy node install --exit-on-fail ComfyUI_Comfyroll_CustomNodes
 RUN comfy node install --exit-on-fail comfyui_layerstyle@2.0.38
 RUN comfy node install --exit-on-fail comfyui-kjnodes@1.2.9
-RUN comfy node install --exit-on-fail ComfyUI-VideoHelperSuite
+RUN git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git /comfyui/custom_nodes/ComfyUI-VideoHelperSuite
 
 # Install additional Python dependencies (not in requirements.txt)
 RUN pip install --no-cache-dir \
     av \
-    torchaudio
+    torchaudio \
+    opencv-python \
+    imageio-ffmpeg
 
 # Create directory structure for models
 RUN mkdir -p /comfyui/models/transformers/TencentGameMate/chinese-wav2vec2-base && \

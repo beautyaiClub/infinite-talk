@@ -15,37 +15,21 @@ RUN git clone https://github.com/beautyaiClub/comfyui-beautyai.git /comfyui/cust
 RUN git clone https://github.com/christian-byrne/audio-separation-nodes-comfyui.git /comfyui/custom_nodes/audio-separation-nodes-comfyui && \
     cd /comfyui/custom_nodes/audio-separation-nodes-comfyui && \
     pip install --no-cache-dir -r requirements.txt
-
-# Install additional Python dependencies first
-RUN pip install --no-cache-dir \
-    av \
-    torchaudio \
-    imageio-ffmpeg \
-    opencv-contrib-python
-
-# Install nodes - opencv-contrib-python is already installed
+RUN git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git /comfyui/custom_nodes/ComfyUI-VideoHelperSuite && \
+    cd /comfyui/custom_nodes/ComfyUI-VideoHelperSuite && \
+    pip install --no-cache-dir -r requirements.txt
 RUN comfy node install --exit-on-fail comfyui-various
 RUN comfy node install --exit-on-fail ComfyUI-WanVideoWrapper@1.4.7
 RUN comfy node install --exit-on-fail ComfyUI_Comfyroll_CustomNodes
 RUN comfy node install --exit-on-fail comfyui_layerstyle@2.0.38
+RUN comfy node install --exit-on-fail comfyui-kjnodes@1.2.9
 
-# Install VideoHelperSuite - skip opencv-python installation since we have opencv-contrib-python
-RUN git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git /comfyui/custom_nodes/ComfyUI-VideoHelperSuite && \
-    cd /comfyui/custom_nodes/ComfyUI-VideoHelperSuite && \
-    sed -i 's/opencv-python/# opencv-python/' requirements.txt && \
-    pip install --no-cache-dir -r requirements.txt
-
-# Install kjnodes - replace opencv-python-headless with opencv-contrib-python
-RUN comfy node install --exit-on-fail comfyui-kjnodes@1.2.9 && \
-    pip uninstall -y opencv-python-headless opencv-python 2>/dev/null || true && \
-    pip install --no-cache-dir opencv-contrib-python
-
-# Verify installations
-RUN echo "=== Verifying VideoHelperSuite installation ===" && \
-    ls -la /comfyui/custom_nodes/ && \
-    test -d /comfyui/custom_nodes/ComfyUI-VideoHelperSuite && \
-    echo "=== VideoHelperSuite directory exists ===" && \
-    python -c "import cv2; print(f'OpenCV version: {cv2.__version__}'); from cv2 import ximgproc; print('ximgproc module available')"
+# Install additional Python dependencies (not in requirements.txt)
+RUN pip install --no-cache-dir \
+    av \
+    torchaudio \
+    opencv-python \
+    imageio-ffmpeg
 
 # Create directory structure for models
 RUN mkdir -p /comfyui/models/transformers/TencentGameMate/chinese-wav2vec2-base && \

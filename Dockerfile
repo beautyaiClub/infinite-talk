@@ -11,18 +11,6 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# # Install ComfyUI-WanVideoWrapper (InfiniteTalk/MultiTalk support)
-# RUN git clone https://github.com/kijai/ComfyUI-WanVideoWrapper.git /comfyui/custom_nodes/ComfyUI-WanVideoWrapper && \
-#     cd /comfyui/custom_nodes/ComfyUI-WanVideoWrapper && \
-#     pip install --no-cache-dir -r requirements.txt
-
-# # Install ComfyUI LayerStyle (for ImageScaleByAspectRatio V2 node)
-# RUN git clone https://github.com/chflame163/ComfyUI_LayerStyle.git /comfyui/custom_nodes/comfyui_layerstyle && \
-#     cd /comfyui/custom_nodes/comfyui_layerstyle && \
-#     pip install --no-cache-dir -r requirements.txt
-
-# # Install KJNodes (commonly used utility nodes)
-# RUN comfy node install --exit-on-fail comfyui-kjnodes
 RUN git clone https://github.com/beautyaiClub/comfyui-beautyai.git /comfyui/custom_nodes/comfyui-beautyai
 RUN comfy node install --exit-on-fail audio-separation-nodes-comfyui@1.5.0 --mode remote
 RUN comfy node install --exit-on-fail comfyui-various
@@ -31,8 +19,10 @@ RUN comfy node install --exit-on-fail ComfyUI_Comfyroll_CustomNodes
 RUN comfy node install --exit-on-fail comfyui_layerstyle@2.0.38
 RUN comfy node install --exit-on-fail comfyui-kjnodes@1.2.9
 
-# Install additional Python dependencies for audio processing
-RUN pip install --no-cache-dir av
+# Install additional Python dependencies (not in requirements.txt)
+RUN pip install --no-cache-dir \
+    av \
+    torchaudio
 
 # Create directory structure for models
 RUN mkdir -p /comfyui/models/transformers/TencentGameMate/chinese-wav2vec2-base && \

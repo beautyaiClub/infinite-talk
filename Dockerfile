@@ -12,7 +12,9 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 RUN git clone https://github.com/beautyaiClub/comfyui-beautyai.git /comfyui/custom_nodes/comfyui-beautyai
-RUN comfy node install --exit-on-fail audio-separation-nodes-comfyui@1.5.0 --mode remote
+RUN git clone https://github.com/christian-byrne/audio-separation-nodes-comfyui.git /comfyui/custom_nodes/audio-separation-nodes-comfyui && \
+    cd /comfyui/custom_nodes/audio-separation-nodes-comfyui && \
+    pip install --no-cache-dir -r requirements.txt
 RUN comfy node install --exit-on-fail comfyui-various
 RUN comfy node install --exit-on-fail ComfyUI-WanVideoWrapper@1.4.7
 RUN comfy node install --exit-on-fail ComfyUI_Comfyroll_CustomNodes

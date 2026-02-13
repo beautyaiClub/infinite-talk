@@ -15,14 +15,35 @@ RUN git clone https://github.com/beautyaiClub/comfyui-beautyai.git /comfyui/cust
 RUN git clone https://github.com/christian-byrne/audio-separation-nodes-comfyui.git /comfyui/custom_nodes/audio-separation-nodes-comfyui && \
     cd /comfyui/custom_nodes/audio-separation-nodes-comfyui && \
     pip install --no-cache-dir -r requirements.txt
+
+# Install VideoHelperSuite with verification
+RUN git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git /comfyui/custom_nodes/ComfyUI-VideoHelperSuite && \
+    cd /comfyui/custom_nodes/ComfyUI-VideoHelperSuite && \
+    echo "=== VideoHelperSuite cloned successfully ===" && \
+    ls -la && \
+    pip install --no-cache-dir -r requirements.txt && \
+    echo "=== VideoHelperSuite requirements installed ===" && \
+    test -f __init__.py && echo "=== __init__.py exists ===" || echo "=== ERROR: __init__.py missing ==="
+
 RUN comfy node install --exit-on-fail comfyui-various
 RUN comfy node install --exit-on-fail ComfyUI-WanVideoWrapper@1.4.7
 RUN comfy node install --exit-on-fail ComfyUI_Comfyroll_CustomNodes
 RUN comfy node install --exit-on-fail comfyui_layerstyle@2.0.38
 RUN comfy node install --exit-on-fail comfyui-kjnodes@1.2.9
-RUN git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git /comfyui/custom_nodes/ComfyUI-VideoHelperSuite && \
-    cd /comfyui/custom_nodes/ComfyUI-VideoHelperSuite && \
-    pip install --no-cache-dir -r requirements.txt
+
+# Verify VideoHelperSuite installation
+RUN echo "=== Verifying VideoHelperSuite installation ===" && \
+    ls -la /comfyui/custom_nodes/ && \
+    test -d /comfyui/custom_nodes/ComfyUI-VideoHelperSuite && \
+    echo "=== VideoHelperSuite directory exists ===" || \
+    (echo "=== ERROR: VideoHelperSuite directory missing ===" && exit 1)
+
+# Install additional Python dependencies (not in requirements.txt)
+RUN pip install --no-cache-dir \
+    av \
+    torchaudio \
+    opencv-python \
+    imageio-ffmpeg
 
 # Create directory structure for models
 RUN mkdir -p /comfyui/models/transformers/TencentGameMate/chinese-wav2vec2-base && \
@@ -68,27 +89,41 @@ RUN comfy model download \
     --relative-path models/text_encoders \
     --filename umt5_xxl_fp16.safetensors
 
-# # Download LoRA 1
-# RUN comfy model download \
-#     --url https://huggingface.co/lgylgy/Wan21_I2V_14B_lightx2v_cfg_step_distill_lora_rank64/resolve/main/Wan21_I2V_14B_lightx2v_cfg_step_distill_lora_rank64.safetensors \
-#     --relative-path models/loras/wan \
-#     --filename Wan21_I2V_14B_lightx2v_cfg_step_distill_lora_rank64.safetensors
+# Download LoRA 1
+RUN comfy model download \
+    --url https://huggingface.co/lgylgy/Wan21_I2V_14B_lightx2v_cfg_step_distill_lora_rank64/resolve/main/Wan21_I2V_14B_lightx2v_cfg_step_distill_lora_rank64.safetensors \
+    --relative-path models/loras/wan \
+    --filename Wan21_I2V_14B_lightx2v_cfg_step_distill_lora_rank64.safetensors
 
-# # Download LoRA 2
-# RUN comfy model download \
-#     --url https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/LoRAs/rCM/Wan_2_1_T2V_14B_480p_rCM_lora_average_rank_83_bf16.safetensors \
-#     --relative-path models/loras/wan \
-#     --filename Wan_2_1_T2V_14B_480p_rCM_lora_average_rank_83_bf16.safetensors
+# Download LoRA 2
+RUN comfy model download \
+    --url https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/LoRAs/rCM/Wan_2_1_T2V_14B_480p_rCM_lora_average_rank_83_bf16.safetensors \
+    --relative-path models/loras/wan \
+    --filename Wan_2_1_T2V_14B_480p_rCM_lora_average_rank_83_bf16.safetensors
 
 # Verify downloaded models
-# RUN echo "=== Verifying downloaded models ===" && \
-#     ls -lh /comfyui/models/transformers/TencentGameMate/chinese-wav2vec2-base/ && \
-#     ls -lh /comfyui/models/diffusion_models/Wan2.1/ && \
-#     ls -lh /comfyui/models/vae/ && \
-#     ls -lh /comfyui/models/clip_vision/ && \
-#     ls -lh /comfyui/models/text_encoders/ && \
-#     ls -lh /comfyui/models/loras/wan/ && \
-#     echo "=== Model verification complete ==="
+RUN echo "=== Verifying downloaded models ===" && \
+    ls -lh /comfyui/models/transformers/TencentGameMate/chinese-wav2vec2-base/ && \
+    ls -lh /comfyui/models/diffusion_models/Wan2.1/ && \
+    ls -lh /comfyui/models/vae/ && \
+    ls -lh /comfyui/models/clip_vision/ && \
+    ls -lh /comfyui/models/text_encoders/ && \
+    ls -lh /comfyui/models/loras/wan/ && \
+    echo "=== Model verification complete ==="
 
 # Set working directory
 WORKDIR /comfyui
+
+# The base image already has the correct CMD for RunPod worker
+
+# IMPORTANT: Update the Hugging Face URLs above with the correct model locations
+# You can find models at:
+# - https://huggingface.co/Kijai/WanVideo_pruned
+# - https://huggingface.co/TencentGameMate/chinese-wav2vec2-base
+# - Other relevant Hugging Face repositories
+
+# Build notes:
+# - Build time: 30-60 minutes (downloading 35-45 GB of models)
+# - Image size: ~40-50 GB
+# - Requires stable internet connection
+# - No local models needed

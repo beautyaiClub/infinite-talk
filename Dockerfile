@@ -16,34 +16,36 @@ RUN git clone https://github.com/christian-byrne/audio-separation-nodes-comfyui.
     cd /comfyui/custom_nodes/audio-separation-nodes-comfyui && \
     pip install --no-cache-dir -r requirements.txt
 
-# Install nodes in specific order to avoid opencv conflicts
+# Install additional Python dependencies first
+RUN pip install --no-cache-dir \
+    av \
+    torchaudio \
+    imageio-ffmpeg \
+    opencv-contrib-python
+
+# Install nodes - opencv-contrib-python is already installed
 RUN comfy node install --exit-on-fail comfyui-various
 RUN comfy node install --exit-on-fail ComfyUI-WanVideoWrapper@1.4.7
 RUN comfy node install --exit-on-fail ComfyUI_Comfyroll_CustomNodes
 RUN comfy node install --exit-on-fail comfyui_layerstyle@2.0.38
 
-# Install additional Python dependencies BEFORE VideoHelperSuite and kjnodes
-RUN pip install --no-cache-dir \
-    av \
-    torchaudio \
-    imageio-ffmpeg
-
-# Install VideoHelperSuite - it will install opencv-python
+# Install VideoHelperSuite - skip opencv-python installation since we have opencv-contrib-python
 RUN git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git /comfyui/custom_nodes/ComfyUI-VideoHelperSuite && \
     cd /comfyui/custom_nodes/ComfyUI-VideoHelperSuite && \
+    sed -i 's/opencv-python/# opencv-python/' requirements.txt && \
     pip install --no-cache-dir -r requirements.txt
 
-# Install kjnodes AFTER VideoHelperSuite, and prevent opencv-python-headless from being installed
+# Install kjnodes - replace opencv-python-headless with opencv-contrib-python
 RUN comfy node install --exit-on-fail comfyui-kjnodes@1.2.9 && \
-    pip uninstall -y opencv-python-headless && \
-    pip install --no-cache-dir opencv-python
+    pip uninstall -y opencv-python-headless opencv-python 2>/dev/null || true && \
+    pip install --no-cache-dir opencv-contrib-python
 
-# Verify VideoHelperSuite installation
+# Verify installations
 RUN echo "=== Verifying VideoHelperSuite installation ===" && \
     ls -la /comfyui/custom_nodes/ && \
     test -d /comfyui/custom_nodes/ComfyUI-VideoHelperSuite && \
     echo "=== VideoHelperSuite directory exists ===" && \
-    python -c "import cv2; print(f'OpenCV version: {cv2.__version__}')"
+    python -c "import cv2; print(f'OpenCV version: {cv2.__version__}'); from cv2 import ximgproc; print('ximgproc module available')"
 
 # Create directory structure for models
 RUN mkdir -p /comfyui/models/transformers/TencentGameMate/chinese-wav2vec2-base && \

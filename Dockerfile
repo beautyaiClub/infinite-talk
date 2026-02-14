@@ -14,6 +14,14 @@ RUN apt-get update && apt-get install -y \
     g++ \
     && rm -rf /var/lib/apt/lists/*
 
+# Create symlink for libcuda.so if it doesn't exist (needed for triton compilation)
+# The actual libcuda.so.1 is provided by the NVIDIA driver at runtime
+RUN mkdir -p /usr/local/cuda/lib64/stubs && \
+    if [ ! -f /usr/lib/x86_64-linux-gnu/libcuda.so ]; then \
+        ln -s /usr/local/cuda/lib64/stubs/libcuda.so /usr/lib/x86_64-linux-gnu/libcuda.so || \
+        touch /usr/lib/x86_64-linux-gnu/libcuda.so; \
+    fi
+
 # Force cache bust for comfyui-beautyai - Updated: 2026-02-14 (refactored to modular structure)
 RUN git clone https://github.com/beautyaiClub/comfyui-beautyai.git -b main /comfyui/custom_nodes/comfyui-beautyai
 RUN git clone https://github.com/christian-byrne/audio-separation-nodes-comfyui.git /comfyui/custom_nodes/audio-separation-nodes-comfyui && \

@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y \
     python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Force cache bust for comfyui-beautyai - Updated: 2026-02-14 19:00 (RunPod output format fix)
+# Force cache bust for comfyui-beautyai - Updated: 2026-02-15 09:00 (R2 upload implementation)
 RUN git clone https://github.com/beautyaiClub/comfyui-beautyai.git -b main /comfyui/custom_nodes/comfyui-beautyai
 RUN git clone https://github.com/christian-byrne/audio-separation-nodes-comfyui.git /comfyui/custom_nodes/audio-separation-nodes-comfyui && \
     cd /comfyui/custom_nodes/audio-separation-nodes-comfyui && \
@@ -31,7 +31,8 @@ RUN pip install --no-cache-dir \
     av \
     torchaudio \
     scipy \
-    sageattention
+    sageattention \
+    boto3
 
 # Create directory structure for models
 RUN mkdir -p /comfyui/models/transformers/TencentGameMate/chinese-wav2vec2-base && \

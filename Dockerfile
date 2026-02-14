@@ -15,18 +15,6 @@ RUN apt-get update && apt-get install -y \
     python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Create a minimal libcuda stub for compilation
-# The real libcuda.so.1 is provided by NVIDIA driver at runtime
-# This stub is only used during triton's JIT compilation
-RUN echo 'void cuInit() {}' > /tmp/libcuda_stub.c && \
-    gcc -shared -fPIC /tmp/libcuda_stub.c -o /usr/lib/x86_64-linux-gnu/libcuda_stub.so && \
-    ln -sf /usr/lib/x86_64-linux-gnu/libcuda_stub.so /usr/lib/x86_64-linux-gnu/libcuda.so && \
-    rm /tmp/libcuda_stub.c
-
-# Set library path for runtime
-ENV LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LIBRARY_PATH
-ENV LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
-
 # Force cache bust for comfyui-beautyai - Updated: 2026-02-14 18:00 (video output format fix)
 RUN git clone https://github.com/beautyaiClub/comfyui-beautyai.git -b main /comfyui/custom_nodes/comfyui-beautyai
 RUN git clone https://github.com/christian-byrne/audio-separation-nodes-comfyui.git /comfyui/custom_nodes/audio-separation-nodes-comfyui && \

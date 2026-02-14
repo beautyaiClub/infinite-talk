@@ -26,7 +26,8 @@ RUN comfy node install --exit-on-fail comfyui-kjnodes@1.2.9
 RUN pip install --no-cache-dir \
     av \
     torchaudio \
-    scipy
+    scipy \
+    sageattention
 
 # Create directory structure for models
 RUN mkdir -p /comfyui/models/transformers/TencentGameMate/chinese-wav2vec2-base && \

@@ -12,8 +12,6 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     gcc \
     g++ \
-    cuda-nvcc-12-1 \
-    libcuda1 \
     && rm -rf /var/lib/apt/lists/*
 
 # Force cache bust for comfyui-beautyai - Updated: 2026-02-14 (refactored to modular structure)

@@ -15,9 +15,6 @@ RUN git clone https://github.com/beautyaiClub/comfyui-beautyai.git /comfyui/cust
 RUN git clone https://github.com/christian-byrne/audio-separation-nodes-comfyui.git /comfyui/custom_nodes/audio-separation-nodes-comfyui && \
     cd /comfyui/custom_nodes/audio-separation-nodes-comfyui && \
     pip install --no-cache-dir -r requirements.txt
-RUN git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git /comfyui/custom_nodes/ComfyUI-VideoHelperSuite && \
-    cd /comfyui/custom_nodes/ComfyUI-VideoHelperSuite && \
-    pip install --no-cache-dir -r requirements.txt
 RUN comfy node install --exit-on-fail comfyui-various
 RUN comfy node install --exit-on-fail ComfyUI-WanVideoWrapper@1.4.7
 RUN comfy node install --exit-on-fail ComfyUI_Comfyroll_CustomNodes
@@ -28,8 +25,7 @@ RUN comfy node install --exit-on-fail comfyui-kjnodes@1.2.9
 RUN pip install --no-cache-dir \
     av \
     torchaudio \
-    opencv-python \
-    imageio-ffmpeg
+    scipy
 
 # Create directory structure for models
 RUN mkdir -p /comfyui/models/transformers/TencentGameMate/chinese-wav2vec2-base && \

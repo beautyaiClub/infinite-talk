@@ -3,12 +3,15 @@
 
 FROM runpod/worker-comfyui:5.5.1-base
 
-# Install system dependencies
+# Install system dependencies including build tools for triton/sageattention
 RUN apt-get update && apt-get install -y \
     ffmpeg \
     libsndfile1 \
     wget \
     curl \
+    build-essential \
+    gcc \
+    g++ \
     && rm -rf /var/lib/apt/lists/*
 
 # Force cache bust for comfyui-beautyai - Updated: 2026-02-14 (refactored to modular structure)

@@ -14,12 +14,9 @@ RUN apt-get update && apt-get install -y \
     g++ \
     && rm -rf /var/lib/apt/lists/*
 
-# Debug: Check what CUDA libraries are available in the base image
-RUN echo "=== Checking CUDA installation ===" && \
-    find /usr -name "libcuda*" 2>/dev/null || echo "No libcuda found in /usr" && \
-    find /opt -name "libcuda*" 2>/dev/null || echo "No libcuda found in /opt" && \
-    ls -la /usr/local/cuda* 2>/dev/null || echo "No /usr/local/cuda directory" && \
-    echo "=== End CUDA check ==="
+# Set library path to help gcc find CUDA libraries during triton compilation
+ENV LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LIBRARY_PATH
+ENV LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
 
 # Force cache bust for comfyui-beautyai - Updated: 2026-02-14 (refactored to modular structure)
 RUN git clone https://github.com/beautyaiClub/comfyui-beautyai.git -b main /comfyui/custom_nodes/comfyui-beautyai

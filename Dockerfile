@@ -18,6 +18,14 @@ RUN apt-get update && apt-get install -y \
 ENV LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LIBRARY_PATH
 ENV LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
 
+# Test gcc can find and link libcuda
+RUN echo "=== Testing gcc CUDA linking ===" && \
+    echo 'int main() { return 0; }' > /tmp/test.c && \
+    gcc /tmp/test.c -lcuda -L/usr/lib/x86_64-linux-gnu -o /tmp/test 2>&1 || \
+    echo "WARNING: gcc cannot link libcuda, but continuing..." && \
+    rm -f /tmp/test.c /tmp/test && \
+    echo "=== CUDA link test complete ==="
+
 # Force cache bust for comfyui-beautyai - Updated: 2026-02-14 (refactored to modular structure)
 RUN git clone https://github.com/beautyaiClub/comfyui-beautyai.git -b main /comfyui/custom_nodes/comfyui-beautyai
 RUN git clone https://github.com/christian-byrne/audio-separation-nodes-comfyui.git /comfyui/custom_nodes/audio-separation-nodes-comfyui && \

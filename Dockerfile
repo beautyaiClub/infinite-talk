@@ -14,17 +14,17 @@ RUN apt-get update && apt-get install -y \
     g++ \
     && rm -rf /var/lib/apt/lists/*
 
-# Set library path to help gcc find CUDA libraries during triton compilation
+# Create a minimal libcuda stub for compilation
+# The real libcuda.so.1 is provided by NVIDIA driver at runtime
+# This stub is only used during triton's JIT compilation
+RUN echo 'void cuInit() {}' > /tmp/libcuda_stub.c && \
+    gcc -shared -fPIC /tmp/libcuda_stub.c -o /usr/lib/x86_64-linux-gnu/libcuda_stub.so && \
+    ln -sf /usr/lib/x86_64-linux-gnu/libcuda_stub.so /usr/lib/x86_64-linux-gnu/libcuda.so && \
+    rm /tmp/libcuda_stub.c
+
+# Set library path for runtime
 ENV LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LIBRARY_PATH
 ENV LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
-
-# Test gcc can find and link libcuda
-RUN echo "=== Testing gcc CUDA linking ===" && \
-    echo 'int main() { return 0; }' > /tmp/test.c && \
-    gcc /tmp/test.c -lcuda -L/usr/lib/x86_64-linux-gnu -o /tmp/test 2>&1 || \
-    echo "WARNING: gcc cannot link libcuda, but continuing..." && \
-    rm -f /tmp/test.c /tmp/test && \
-    echo "=== CUDA link test complete ==="
 
 # Force cache bust for comfyui-beautyai - Updated: 2026-02-14 (refactored to modular structure)
 RUN git clone https://github.com/beautyaiClub/comfyui-beautyai.git -b main /comfyui/custom_nodes/comfyui-beautyai

@@ -27,7 +27,7 @@ RUN echo 'void cuInit() {}' > /tmp/libcuda_stub.c && \
 ENV LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LIBRARY_PATH
 ENV LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
 
-# Force cache bust for comfyui-beautyai - Updated: 2026-02-14 (refactored to modular structure)
+# Force cache bust for comfyui-beautyai - Updated: 2026-02-14 18:00 (video output format fix)
 RUN git clone https://github.com/beautyaiClub/comfyui-beautyai.git -b main /comfyui/custom_nodes/comfyui-beautyai
 RUN git clone https://github.com/christian-byrne/audio-separation-nodes-comfyui.git /comfyui/custom_nodes/audio-separation-nodes-comfyui && \
     cd /comfyui/custom_nodes/audio-separation-nodes-comfyui && \

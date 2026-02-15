@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y \
     python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Force cache bust for comfyui-beautyai - Updated: 2026-02-15 14:00 (Handler patch)
+# Force cache bust for comfyui-beautyai - Updated: 2026-02-16 00:00 (Timeout fix)
 RUN git clone https://github.com/beautyaiClub/comfyui-beautyai.git -b main /comfyui/custom_nodes/comfyui-beautyai && \
     cd /comfyui/custom_nodes/comfyui-beautyai && \
     pip install --no-cache-dir -r requirements.txt
@@ -106,6 +106,10 @@ COPY patch_handler.py /tmp/patch_handler.py
 RUN python3 /tmp/patch_handler.py && \
     rm /tmp/patch_handler.py && \
     echo "=== Handler patch applied successfully ==="
+
+# Set RunPod timeout to 30 minutes for video generation
+ENV RUNPOD_TIMEOUT=1800
+ENV RUNPOD_MAX_EXECUTION_TIME=1800
 
 # Set working directory
 WORKDIR /comfyui

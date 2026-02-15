@@ -94,18 +94,28 @@ def extract_r2_url(history):
         r2_url: The R2 video URL, or None if not found
     """
     if "outputs" not in history:
+        print("ERROR: No 'outputs' in history")
         return None
 
+    print(f"DEBUG: History outputs keys: {list(history['outputs'].keys())}")
+
     for node_id, node_output in history["outputs"].items():
+        print(f"DEBUG: Node {node_id} output keys: {list(node_output.keys())}")
+        print(f"DEBUG: Node {node_id} output: {node_output}")
+
         # Check for r2_url in node output
         if "r2_url" in node_output:
             r2_url = node_output["r2_url"]
+            print(f"DEBUG: Found r2_url, type: {type(r2_url)}, value: {r2_url}")
             # Handle both string and list formats
             if isinstance(r2_url, list) and len(r2_url) > 0:
+                print(f"DEBUG: Returning first element of list: {r2_url[0]}")
                 return r2_url[0]
             elif isinstance(r2_url, str):
+                print(f"DEBUG: Returning string: {r2_url}")
                 return r2_url
 
+    print("ERROR: No r2_url found in any node output")
     return None
 
 

@@ -102,9 +102,9 @@ RUN echo "=== Verifying downloaded models ===" && \
     echo "=== Model verification complete ==="
 
 # Copy and apply handler patch to transform r2_url output
-COPY handler.patch /tmp/handler.patch
-RUN patch /handler.py < /tmp/handler.patch && \
-    rm /tmp/handler.patch && \
+COPY patch_handler.py /tmp/patch_handler.py
+RUN python3 /tmp/patch_handler.py && \
+    rm /tmp/patch_handler.py && \
     echo "=== Handler patch applied successfully ==="
 
 # Set working directory

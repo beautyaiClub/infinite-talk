@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y \
     python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Force cache bust for comfyui-beautyai - Updated: 2026-02-15 13:00 (Simplified wrapper)
+# Force cache bust for comfyui-beautyai - Updated: 2026-02-15 14:00 (Handler patch)
 RUN git clone https://github.com/beautyaiClub/comfyui-beautyai.git -b main /comfyui/custom_nodes/comfyui-beautyai && \
     cd /comfyui/custom_nodes/comfyui-beautyai && \
     pip install --no-cache-dir -r requirements.txt
@@ -101,10 +101,16 @@ RUN echo "=== Verifying downloaded models ===" && \
     ls -lh /comfyui/models/loras/wan/ && \
     echo "=== Model verification complete ==="
 
+# Copy and apply handler patch to transform r2_url output
+COPY handler.patch /tmp/handler.patch
+RUN patch /handler.py < /tmp/handler.patch && \
+    rm /tmp/handler.patch && \
+    echo "=== Handler patch applied successfully ==="
+
 # Set working directory
 WORKDIR /comfyui
 
-# Use default RunPod worker (no custom handler needed)
+# Use default RunPod worker (with our patch applied)
 # The base image already has the correct CMD
 
 # Build notes:

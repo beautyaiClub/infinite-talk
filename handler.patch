@@ -1,0 +1,32 @@
+--- /handler.py.orig
++++ /handler.py
+@@ -659,6 +659,28 @@
+         prompt_history = history.get(prompt_id, {})
+         outputs = prompt_history.get("outputs", {})
+
++        # Check for r2_url in outputs and return it directly
++        for node_id, node_output in outputs.items():
++            if "r2_url" in node_output:
++                r2_url = node_output["r2_url"]
++                print(f"worker-comfyui - Found r2_url in node {node_id}")
++
++                # Handle character array format (ComfyUI bug)
++                if isinstance(r2_url, list) and len(r2_url) > 0:
++                    if all(isinstance(c, str) and len(c) == 1 for c in r2_url):
++                        # Join character array into full URL
++                        video_url = ''.join(r2_url)
++                        print(f"worker-comfyui - Joined character array into URL: {video_url}")
++                    else:
++                        # Normal list with full string
++                        video_url = r2_url[0]
++                elif isinstance(r2_url, str):
++                    video_url = r2_url
++                else:
++                    video_url = str(r2_url)
++
++                print(f"worker-comfyui - Returning video URL: {video_url}")
++                return {"video": video_url}
++
+         if not outputs:
+             warning_msg = f"No outputs found in history for prompt {prompt_id}."
+             print(f"worker-comfyui - {warning_msg}")

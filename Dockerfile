@@ -100,19 +100,20 @@ RUN echo "=== Verifying downloaded models ===" && \
     ls -lh /comfyui/models/loras/wan/ && \
     echo "=== Model verification complete ==="
 
+# Copy custom handler and startup script
+COPY handler.py /comfyui/handler.py
+COPY start.sh /comfyui/start.sh
+RUN chmod +x /comfyui/start.sh
+
 # Set working directory
 WORKDIR /comfyui
 
-# The base image already has the correct CMD for RunPod worker
-
-# IMPORTANT: Update the Hugging Face URLs above with the correct model locations
-# You can find models at:
-# - https://huggingface.co/Kijai/WanVideo_pruned
-# - https://huggingface.co/TencentGameMate/chinese-wav2vec2-base
-# - Other relevant Hugging Face repositories
+# Use custom handler instead of default worker-comfyui
+CMD ["/comfyui/start.sh"]
 
 # Build notes:
 # - Build time: 30-60 minutes (downloading 35-45 GB of models)
 # - Image size: ~40-50 GB
 # - Requires stable internet connection
-# - No local models needed
+# - Custom handler returns: {"video": "https://gen.myreels.ai/generated/{uuid}/{filename}"}
+

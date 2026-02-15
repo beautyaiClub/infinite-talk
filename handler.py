@@ -29,7 +29,19 @@ def queue_prompt(workflow):
         )
         response.raise_for_status()
         result = response.json()
+
+        # Check if ComfyUI returned an error
+        if "error" in result:
+            error_info = result["error"]
+            raise RuntimeError(f"ComfyUI error: {error_info.get('message', str(error_info))}")
+
+        # Check if prompt_id exists
+        if "prompt_id" not in result:
+            raise RuntimeError(f"No prompt_id in response: {result}")
+
         return result["prompt_id"]
+    except requests.exceptions.RequestException as e:
+        raise RuntimeError(f"Failed to connect to ComfyUI: {str(e)}")
     except Exception as e:
         raise RuntimeError(f"Failed to queue prompt: {str(e)}")
 
@@ -110,11 +122,13 @@ def handler(event):
     try:
         # Validate input
         if "input" not in event:
+            print("ERROR: Missing 'input' in event")
             return {
                 "error": "Missing 'input' in event"
             }
 
         if "workflow" not in event["input"]:
+            print("ERROR: Missing 'workflow' in input")
             return {
                 "error": "Missing 'workflow' in input"
             }
@@ -125,18 +139,40 @@ def handler(event):
 
         # 1. Submit workflow to ComfyUI
         print("Submitting workflow to ComfyUI...")
-        prompt_id = queue_prompt(workflow)
-        print(f"Workflow queued with prompt_id: {prompt_id}")
+        try:
+            prompt_id = queue_prompt(workflow)
+            print(f"Workflow queued with prompt_id: {prompt_id}")
+        except RuntimeError as e:
+            error_msg = str(e)
+            print(f"ERROR: Failed to queue workflow: {error_msg}")
+            return {
+                "error": "Failed to queue workflow",
+                "details": error_msg
+            }
 
         # 2. Wait for execution to complete
         print("Waiting for workflow execution...")
-        history = wait_for_completion(prompt_id)
-        print("Workflow execution completed")
+        try:
+            history = wait_for_completion(prompt_id)
+            print("Workflow execution completed")
+        except TimeoutError as e:
+            print(f"ERROR: Workflow timeout: {str(e)}")
+            return {
+                "error": "Workflow execution timeout",
+                "details": str(e)
+            }
+        except Exception as e:
+            print(f"ERROR: Workflow execution failed: {str(e)}")
+            return {
+                "error": "Workflow execution failed",
+                "details": str(e)
+            }
 
         # 3. Extract r2_url from history
         r2_url = extract_r2_url(history)
 
         if not r2_url:
+            print("ERROR: No r2_url found in workflow output")
             return {
                 "error": "No r2_url found in workflow output",
                 "details": "Make sure BeautyAI_UploadVideoToR2 node is in the workflow"
@@ -149,15 +185,15 @@ def handler(event):
             "video": r2_url
         }
 
-    except TimeoutError as e:
-        return {
-            "error": "Workflow execution timeout",
-            "details": str(e)
-        }
     except Exception as e:
+        # Catch-all for any unexpected errors
+        error_msg = str(e)
+        print(f"CRITICAL ERROR: Unexpected exception: {error_msg}")
+        import traceback
+        traceback.print_exc()
         return {
-            "error": "Workflow execution failed",
-            "details": str(e)
+            "error": "Unexpected error",
+            "details": error_msg
         }
 
 

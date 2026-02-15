@@ -106,11 +106,19 @@ def extract_r2_url(history):
         # Check for r2_url in node output
         if "r2_url" in node_output:
             r2_url = node_output["r2_url"]
-            print(f"DEBUG: Found r2_url, type: {type(r2_url)}, value: {r2_url}")
-            # Handle both string and list formats
+            print(f"DEBUG: Found r2_url, type: {type(r2_url)}, length: {len(r2_url) if isinstance(r2_url, list) else 'N/A'}")
+
+            # Handle different formats
             if isinstance(r2_url, list) and len(r2_url) > 0:
-                print(f"DEBUG: Returning first element of list: {r2_url[0]}")
-                return r2_url[0]
+                # Check if it's a list of single characters (ComfyUI bug)
+                if all(isinstance(c, str) and len(c) == 1 for c in r2_url):
+                    url = ''.join(r2_url)
+                    print(f"DEBUG: Joined character array into URL: {url}")
+                    return url
+                else:
+                    # Normal list with full string as first element
+                    print(f"DEBUG: Returning first element of list: {r2_url[0]}")
+                    return r2_url[0]
             elif isinstance(r2_url, str):
                 print(f"DEBUG: Returning string: {r2_url}")
                 return r2_url

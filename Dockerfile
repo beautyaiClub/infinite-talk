@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y \
     python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Force cache bust for comfyui-beautyai - Updated: 2026-02-15 11:00 (UUID + handler)
+# Force cache bust for comfyui-beautyai - Updated: 2026-02-15 12:00 (Fixed char array bug)
 RUN git clone https://github.com/beautyaiClub/comfyui-beautyai.git -b main /comfyui/custom_nodes/comfyui-beautyai && \
     cd /comfyui/custom_nodes/comfyui-beautyai && \
     pip install --no-cache-dir -r requirements.txt

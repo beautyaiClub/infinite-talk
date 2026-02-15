@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y \
     python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Force cache bust for comfyui-beautyai - Updated: 2026-02-15 12:00 (Fixed char array bug)
+# Force cache bust for comfyui-beautyai - Updated: 2026-02-15 13:00 (Simplified wrapper)
 RUN git clone https://github.com/beautyaiClub/comfyui-beautyai.git -b main /comfyui/custom_nodes/comfyui-beautyai && \
     cd /comfyui/custom_nodes/comfyui-beautyai && \
     pip install --no-cache-dir -r requirements.txt
@@ -101,8 +101,8 @@ RUN echo "=== Verifying downloaded models ===" && \
     ls -lh /comfyui/models/loras/wan/ && \
     echo "=== Model verification complete ==="
 
-# Copy custom handler and startup script
-COPY handler.py /comfyui/handler.py
+# Copy custom output transformer wrapper and startup script
+COPY handler_wrapper.py /comfyui/handler_wrapper.py
 COPY start.sh /comfyui/start.sh
 RUN chmod +x /comfyui/start.sh
 

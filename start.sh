@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "=== Starting Custom RunPod Handler ==="
+echo "=== Starting RunPod Worker with Custom Output Handler ==="
 
 # Start ComfyUI in the background
 echo "Starting ComfyUI server..."
@@ -32,7 +32,7 @@ if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
     exit 1
 fi
 
-# Start the custom handler
-echo "Starting RunPod handler..."
+# Start the original RunPod worker with our wrapper
+echo "Starting RunPod worker with output transformer..."
 cd /comfyui
-python -u /comfyui/handler.py
+python -u /comfyui/handler_wrapper.py

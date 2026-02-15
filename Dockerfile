@@ -101,16 +101,11 @@ RUN echo "=== Verifying downloaded models ===" && \
     ls -lh /comfyui/models/loras/wan/ && \
     echo "=== Model verification complete ==="
 
-# Copy custom output transformer wrapper and startup script
-COPY handler_wrapper.py /comfyui/handler_wrapper.py
-COPY start.sh /comfyui/start.sh
-RUN chmod +x /comfyui/start.sh
-
 # Set working directory
 WORKDIR /comfyui
 
-# Use custom handler instead of default worker-comfyui
-CMD ["/comfyui/start.sh"]
+# Use default RunPod worker (no custom handler needed)
+# The base image already has the correct CMD
 
 # Build notes:
 # - Build time: 30-60 minutes (downloading 35-45 GB of models)
